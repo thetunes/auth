@@ -7,7 +7,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// Inirialize config file
+// Config initializes the config file
 func Config(key string) string {
 	// Load environment config
 	err := godotenv.Load(".env")
