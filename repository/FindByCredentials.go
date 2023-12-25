@@ -3,18 +3,20 @@ package repository
 import (
 	"errors"
 
+	"github.com/thetunes/auth/database"
 	"github.com/thetunes/auth/model"
+	"gorm.io/gorm"
 )
 
 func FindByCredentials(username, password string) (*model.User, error) {
-	// Here you would query your database for the user with the given email
-	if username == "test@mail.com" && password == "test12345" {
-		return &model.User{
-			ID:             1,
-			Username:       "test@mail.com",
-			Password:       "test12345",
-			FavoritePhrase: "Hello, World!",
-		}, nil
+	var user model.User
+	// Here you would query your MySQL database for the user with the given username and password
+	result := database.DB.Db.Where("username = ? AND password = ?", username, password).First(&user)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, errors.New("user not found")
+		}
+		return nil, result.Error
 	}
-	return nil, errors.New("user not found")
+	return &user, nil
 }

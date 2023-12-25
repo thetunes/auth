@@ -4,14 +4,17 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/thetunes/auth/config"
-	"github.com/thetunes/auth/router"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/thetunes/auth/config"
+	"github.com/thetunes/auth/database"
+	"github.com/thetunes/auth/router"
 )
 
 func main() {
 	// Create a new Fiber instance
 	app := fiber.New()
+
+	database.Connect()
 
 	// Setup API Router
 	router.SetupRoutes(app)

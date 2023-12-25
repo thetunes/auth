@@ -1,10 +1,11 @@
+// handler.go
 package handler
 
 import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	jtoken "github.com/golang-jwt/jwt/v4"
+	jwt "github.com/golang-jwt/jwt/v4"
 	"github.com/thetunes/auth/config"
 	"github.com/thetunes/auth/model"
 	"github.com/thetunes/auth/repository"
@@ -28,14 +29,13 @@ func Login(c *fiber.Ctx) error {
 
 	day := time.Hour * 24
 
-	claims := jtoken.MapClaims{
+	claims := jwt.MapClaims{
 		"ID":       user.ID,
 		"username": user.Username,
-		"fav":      user.FavoritePhrase,
 		"exp":      time.Now().Add(day * 1).Unix(),
 	}
 
-	token := jtoken.NewWithClaims(jtoken.SigningMethodHS256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	t, err := token.SignedString([]byte(config.Config("AUTH_SECRET")))
 	if err != nil {
@@ -50,9 +50,10 @@ func Login(c *fiber.Ctx) error {
 }
 
 func Protected(c *fiber.Ctx) error {
-	user := c.Locals("user").(*jtoken.Token)
-	claims := user.Claims.(jtoken.MapClaims)
+	user := c.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
 	username := claims["username"].(string)
+	// Assuming you have a "fav" claim in your JWT token
 	favPhrase := claims["fav"].(string)
 	return c.SendString("Welcome 👋" + username + " " + favPhrase)
 }
